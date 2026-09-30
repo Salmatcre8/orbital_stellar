@@ -101,9 +101,10 @@ export function mapTypeDef(type: xdr.ScSpecTypeDef): TypeSpec {
     // encoded regardless of which #[contracterror] enum is named.
     case "scSpecTypeError":
       return "error";
-    // scSpecTypeVal (generic "any" ScVal) has no faithful representation in
-    // our closed PrimitiveType set.
+    // The generic ScVal slot - see PrimitiveType's "val" doc comment in
+    // spec.ts. Real: Reflector's oracle events carry a Val payload field.
     case "scSpecTypeVal":
+      return "val";
     default:
       throw new UnsupportedSpecTypeError(name);
   }

@@ -276,6 +276,7 @@ function mapContractSpecTypeToTs(type: TypeSpec): string {
       case "address":
         return "string";
       case "error":
+      case "val":
         return "unknown";
     }
   }
@@ -320,6 +321,7 @@ function mapContractSpecTypeToZod(type: TypeSpec): string {
       case "address":
         return "z.string()";
       case "error":
+      case "val":
         return "z.unknown()";
     }
   }

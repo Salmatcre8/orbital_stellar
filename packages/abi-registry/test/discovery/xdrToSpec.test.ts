@@ -39,8 +39,11 @@ describe("mapTypeDef - composite and edge-case types not covered by the real WAS
     expect(mapTypeDef(xdr.ScSpecTypeDef.scSpecTypeError())).toBe("error");
   });
 
-  it("throws UnsupportedSpecTypeError for the generic Val type", () => {
-    expect(() => mapTypeDef(xdr.ScSpecTypeDef.scSpecTypeVal())).toThrow(UnsupportedSpecTypeError);
+  it("maps the generic ScVal slot to the val primitive", () => {
+    // Real mainnet shape: Reflector's oracle events declare a Val payload
+    // field; before this mapping, discovery of those contracts threw
+    // UnsupportedSpecTypeError instead of producing a spec at all.
+    expect(mapTypeDef(xdr.ScSpecTypeDef.scSpecTypeVal())).toBe("val");
   });
 
   it("recurses through nested composites: Option<Vec<Address>>", () => {

@@ -33,7 +33,15 @@ export type PrimitiveType =
    * is a separate `types` entry, correlated by convention rather than a
    * direct type reference. Verified against a real soroban-sdk 27 build.
    */
-  | "error";
+  | "error"
+  /**
+   * The generic ScVal slot (`scSpecTypeVal` on the wire): a value of any
+   * Soroban type, deliberately untyped in the contract's own signature.
+   * Real mainnet contracts publish it - Reflector's oracle events carry a
+   * `Val` payload field - so refusing to map it makes those contracts
+   * undiscoverable rather than loosely typed.
+   */
+  | "val";
 
 /** Fixed-length byte array, e.g. `bytes_n<32>`. */
 export type BytesNType = { readonly type: "bytes_n"; readonly size: number };
@@ -252,6 +260,7 @@ const PRIMITIVE_TYPES: ReadonlySet<string> = new Set<PrimitiveType>([
   "address",
   "void",
   "error",
+  "val",
 ]);
 
 const COMPOSITE_TYPE_TAGS = new Set([
