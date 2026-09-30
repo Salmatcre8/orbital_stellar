@@ -92,12 +92,8 @@ export function mapTypeDef(type: xdr.ScSpecTypeDef): TypeSpec {
     }
     case "scSpecTypeTuple": {
       const elements = type.tuple().valueTypes().map(mapTypeDef);
-      // Rust's unit type `()` is encoded as a zero-element tuple - most
-      // commonly as the ok arm of `Result<(), E>` (Phoenix Multihop's admin
-      // functions, for one). Our TypeSpec models unit as the "void"
-      // primitive, and `validateSpec` requires a tuple to carry at least 2
-      // elements, so passing the empty tuple through verbatim produces a
-      // discovered spec that fails validation against real mainnet WASM.
+      // The unit type `()` encodes as an empty tuple on the wire (e.g. the
+      // `Ok` arm of `Result<(), ...>`); it is void semantically.
       if (elements.length === 0) return "void";
       return { type: "tuple", elements };
     }
@@ -110,9 +106,12 @@ export function mapTypeDef(type: xdr.ScSpecTypeDef): TypeSpec {
     // encoded regardless of which #[contracterror] enum is named.
     case "scSpecTypeError":
       return "error";
-    // scSpecTypeVal (generic "any" ScVal) has no faithful representation in
-    // our closed PrimitiveType set.
+    // The generic value slot (`scvVal` on the wire): an argument or return of
+    // any ScVal type. Real and common - DeFindex strategies take `Vec<Val>`
+    // init args. Maps onto PrimitiveType's "val" like "error" does for the
+    // generic error slot.
     case "scSpecTypeVal":
+      return "val";
     default:
       throw new UnsupportedSpecTypeError(name);
   }
