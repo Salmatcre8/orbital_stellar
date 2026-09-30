@@ -26,6 +26,23 @@ describe("mapTypeDef - composite and edge-case types not covered by the real WAS
     expect(mapTypeDef(type)).toEqual({ type: "tuple", elements: ["u32", "bool"] });
   });
 
+  it("maps the empty tuple (Rust's unit) to void, as in Result<(), E>", () => {
+    // Real mainnet shape: Phoenix Multihop's admin functions return
+    // Result<(), ContractError>, whose ok arm is a zero-element tuple.
+    // validateSpec requires tuples to carry >= 2 elements, so without this
+    // mapping a spec discovered from such a contract can never validate.
+    const unit = xdr.ScSpecTypeDef.scSpecTypeTuple(new xdr.ScSpecTypeTuple({ valueTypes: [] }));
+    expect(mapTypeDef(unit)).toBe("void");
+
+    const result = xdr.ScSpecTypeDef.scSpecTypeResult(
+      new xdr.ScSpecTypeResult({
+        okType: unit,
+        errorType: xdr.ScSpecTypeDef.scSpecTypeError(),
+      }),
+    );
+    expect(mapTypeDef(result)).toEqual({ type: "result", ok: "void", err: "error" });
+  });
+
   it("maps muxed address to address", () => {
     expect(mapTypeDef(xdr.ScSpecTypeDef.scSpecTypeMuxedAddress())).toBe("address");
   });

@@ -90,8 +90,17 @@ export function mapTypeDef(type: xdr.ScSpecTypeDef): TypeSpec {
       const map = type.map();
       return { type: "map", key: mapTypeDef(map.keyType()), value: mapTypeDef(map.valueType()) };
     }
-    case "scSpecTypeTuple":
-      return { type: "tuple", elements: type.tuple().valueTypes().map(mapTypeDef) };
+    case "scSpecTypeTuple": {
+      const elements = type.tuple().valueTypes().map(mapTypeDef);
+      // Rust's unit type `()` is encoded as a zero-element tuple - most
+      // commonly as the ok arm of `Result<(), E>` (Phoenix Multihop's admin
+      // functions, for one). Our TypeSpec models unit as the "void"
+      // primitive, and `validateSpec` requires a tuple to carry at least 2
+      // elements, so passing the empty tuple through verbatim produces a
+      // discovered spec that fails validation against real mainnet WASM.
+      if (elements.length === 0) return "void";
+      return { type: "tuple", elements };
+    }
     case "scSpecTypeBytesN":
       return { type: "bytes_n", size: type.bytesN().n() };
     case "scSpecTypeUdt":
