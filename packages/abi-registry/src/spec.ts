@@ -35,11 +35,11 @@ export type PrimitiveType =
    */
   | "error"
   /**
-   * The generic ScVal slot (`scSpecTypeVal` on the wire): a value of any
-   * Soroban type, deliberately untyped in the contract's own signature.
-   * Real mainnet contracts publish it - Reflector's oracle events carry a
-   * `Val` payload field - so refusing to map it makes those contracts
-   * undiscoverable rather than loosely typed.
+   * The generic Soroban value slot (`scvVal` on the wire): an argument or
+   * return of any ScVal type. Real and common - DeFindex strategies take
+   * `Vec<Val>` init args, so discovery hits it on live mainnet contracts.
+   * Like `"error"`, a placeholder the wire format uses where Rust is
+   * generic; verified against the DeFindex Blend strategy WASM.
    */
   | "val";
 

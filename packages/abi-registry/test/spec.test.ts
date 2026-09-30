@@ -230,8 +230,8 @@ describe("spec.schema.json", () => {
       // left behind, so a spec using it passed validateSpec but failed the
       // schema.
       "error",
-      // The generic scSpecTypeVal slot, added alongside discovery support -
-      // Reflector's oracle events carry a Val payload field.
+      // The generic scvVal slot (an argument or return of any ScVal type).
+      // Real and common: DeFindex strategies take Vec<Val> init args.
       "val",
     ];
     expect(enumValues).toHaveLength(expected.length);
