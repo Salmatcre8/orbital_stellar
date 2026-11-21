@@ -1106,10 +1106,22 @@ export type ContractEmittedEvent = {
 /** Discriminated union of every normalized Soroban contract event. */
 export type ContractEvent = ContractInvokedEvent | ContractEmittedEvent;
 
+/**
+ * Tells a contract subscriber that a `contract.emitted` event could not be
+ * decoded with an ABI spec: no spec was found for the contract, the registry
+ * lookup failed, or decoding with the spec failed. `EventEngine` emits it as
+ * `event.decode_failed` on the `Watcher` of each `subscribeContract(id)`
+ * subscription whose filters match the event, then still delivers the event
+ * with `decodedData` undefined. It is raised only while ABI decoding is on,
+ * which it is unless `CoreConfig.abiRegistry` is `false`.
+ */
 export type DecodeFailedNotification = {
   type: "event.decode_failed";
+  /** The contract that emitted the event. */
   contractId: ContractAddress;
+  /** The event's id, when it has one. */
   eventId?: string;
+  /** Why decoding failed. */
   error: string;
 };
 
